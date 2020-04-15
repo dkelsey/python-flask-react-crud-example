@@ -32,7 +32,7 @@ class Home extends React.Component {
  };
 
  async componentDidMount() {
-   const keycloak = Keycloak('/keycloak.json');
+   const keycloak = Keycloak('/key/keycloak.json');
    keycloak.init({onLoad: 'login-required'}).then(
      authenticated => {
        this.setState({ ...this.state, keycloak: keycloak, authenticated: authenticated });
