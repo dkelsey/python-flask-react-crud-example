@@ -1,0 +1,8 @@
+{
+  "realm": "is30realm",
+  "auth-server-url": "http://localhost:8081/auth/",
+  "ssl-required": "external",
+  "resource": "myclient",
+  "public-client": true,
+  "confidential-port": 0
+}
