@@ -1,7 +1,8 @@
 # Overview
 
-This app was crate as an exercise. The goal was to have at least 2 components which communicate with eachother.
-I looked for a basic app to use.  I wanted something with Python, Flask, and React.  I settled on a demo created by OKTA, however I didn't want to integrate with Okta so I modified it to use Keycloak.
+This app was created as an exercise. The goal was to create templates to automate the deployment of an application into OpenShift where the application has least 2 components which communicate with each other.
+
+I looked at a few example apps and chose this one.  I wanted something with Python, Flask, and React.  I settled on the demo created by Okta, however I modified it to use Keycloak-instead of Okta.
 
 I used the following tutorial and other listed material to construct the app:
 
@@ -17,13 +18,10 @@ I used the following tutorial and other listed material to construct the app:
 
 ## The App Components
 
-* A Mongodb database
-
-* A python/flask API 
-
-* A React frontend that integrates with Keycloak for
-
-* A Keacloak setup with a realm, a clent, and some users.
+* A Mongodb database.
+* A python/flask API.
+* A React frontend App that integrates with Keycloak.
+* A Keycloak setup with a realm, a client, and some users.
 
 
 # Provisioning in OpenShift
@@ -37,33 +35,35 @@ I used the following tutorial and other listed material to construct the app:
 
 ## Create ImageStreams and Secrets
 
+_**Note:** I'd suggest you specify the namespace with `-n`_
 ```bash
-oc create imagestream kudo-api -n wvmyix-dev
+oc create imagestream kudo-api -n ${YOUR_NAMESPACE}
 imagestream.image.openshift.io/kudo-api created
 ```
 
 ```bash
-oc create imagestream kudo-app -n wvmyix-dev
+oc create imagestream kudo-app  -n ${YOUR_NAMESPACE}
 imagestream.image.openshift.io/kudo-api created
 ```
 
 ```bash
-oc create  -f mongodb-secret.yaml
+oc create  -f mongodb-secret.yaml -n ${YOUR_NAMESPACE}
 ```
 
 
 ## Provision Mongodb
 
 ```bash
-oc process -f mongodb-template.yaml | oc apply -f -
+oc process -f mongodb-template.yaml | oc apply -f - -n ${YOUR_NAMESPACE}
 ```
 
 ## Provision the API
 
-_Specify your namespace both as a parm to the tempate as the namespace to use in the 'oc apply'_
+_Again, specify your namespace both as a param to the template as the namespace to use in the 'oc apply'_
 ```bash
-oc process -f kudo-api.template.yaml -o yaml -p NAMESPACE=wvmyix-dev \
-  | oc apply -f - -n wvmyix-dev
+oc process -f kudo-api.template.yaml \
+  -o yaml -p NAMESPACE=${YOUR_NAMESPACE} \
+  | oc apply -f - -n ${YOUR_NAMESPACE}
 service/kudo-api created
 deploymentconfig.apps.openshift.io/kudo-api created
 buildconfig.build.openshift.io/kudo-api created
@@ -71,7 +71,9 @@ route.route.openshift.io/kudo-api created
 ```
 ## Configure Keycloak
 
-TODO
+#### _TODO_
+* This needs more detail
+
 _Generally:_
 1. Login as admin/admin
 2. Create a realm
@@ -82,15 +84,17 @@ _Generally:_
 
 ## Provision the React App
 
-TODO
-you'll need to update the `keycloak.json` in the `/public` folder of your repo, commit/push and rebuild/deploy the image.
+#### _TODO_
+* This needs more detail.
 
-_I provided a kudo-app.env.sample that can be cusomized_
+You'll need to update the `keycloak.json` in the `/public` folder of your repo, commit/push and rebuild/deploy the image.
+
+_I provided a kudo-app.env.sample that can be customized. Note: the env file specifies a NAMESPACE variable._
 ```bash
 oc process -f kudo-app.template.yaml \
   --param-file=kudo-app.env \
   -o yaml \
-  | oc apply -f - -n wvmyix-dev
+  | oc apply -f - -n ${YOUR_NAMESPACE}
 ```
 
 # Development Environment Setup
@@ -101,10 +105,12 @@ oc process -f kudo-app.template.yaml \
 3. Setup the API
 4. Setup the React App
 
-### The local Keycloak service
+#### Notes
+* I describe a few `bootstrap` files I've created.  This are not in the repo.  
+
+### Setup a local Keycloak service
 
 I created `bootstrap-keycloak`
-
 ```bash
 docker run -ti -p 8081:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin quay.io/keycloak/keycloak:9.0.2
 ```
@@ -113,15 +119,15 @@ docker run -ti -p 8081:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin qu
 . bootstrap-keycloak
 ```
 
-#### Keycload tasks
+#### Keycloak Tasks
 
-1. Login as admin/admin
+1. Login as `admin/admin`
 2. Create a realm
 3. Add a user to your realm
 4. Add a client to your realm - for this app.
-5. For the client, get the `keycloak.json` config file (Keycloak OIDC JSON) and place it in `/public` of your running node app.
+5. For the client, get the `keycloak.json` config file (`Keycloak OIDC JSON`) and place it in `/public` of your running node app.
 
-### The local Mongodb
+### Setup a local MongoDB
 
 * This requires `docker-compose`
 
@@ -146,8 +152,8 @@ docker-compose up -d
 
 ### The Python/Flask API
 
-* add Mongo connections info to environment
-  * The original instructions had this step.  I've added it to a `bootstrap-app` script instead, but showeing this here so that it's clear the `MONGO_URL`must be set.
+* Add Mongo connection info to environment
+  * _The original instructions had this step.  I've added it to a `bootstrap-app` script instead, but showing this here so that it's clear the `MONGO_URL`must be set._
 
 ```bash
 export MONGO_URL=mongodb://mongo_user:mongo_secret@0.0.0.0:27017/
@@ -180,4 +186,3 @@ npm install
 ...
 HOST=localhost PORT=8080 npm start
 ```
-
