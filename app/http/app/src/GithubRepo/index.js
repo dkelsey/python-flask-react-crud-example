@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -27,6 +26,8 @@ class GithubRepo extends React.Component {
   handleClick = (event) =>  {
     this.props.onKudo(this.props.repo)
   }
+
+
   render() {
     const { classes } = this.props;
 
@@ -40,7 +41,7 @@ class GithubRepo extends React.Component {
             {this.props.repo.description}
           </Typography>
         </CardContent>
-        <CardActions className={classes.actions} disableActionSpacing>
+        <CardActions className={classes.actions} disableactionspacing="true">
           <IconButton aria-label="Add to favorites" onClick={this.handleClick}>
             <FavoriteIcon color={this.props.isKudo ? "secondary" : "primary"} />
           </IconButton>
@@ -49,9 +50,5 @@ class GithubRepo extends React.Component {
     );
   }
 }
-
-GithubRepo.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
 
 export default withStyles(styles)(GithubRepo);
