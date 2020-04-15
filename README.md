@@ -2,7 +2,7 @@
 
 This app was created as an exercise. The goal was to create templates to automate the deployment of an application into OpenShift where the application has least 2 components which communicate with each other.
 
-I looked at a few example apps and chose this one.  I wanted something with Python, Flask, and React.  I settled on the demo created by Okta, however I modified it to use Keycloak-instead of Okta.
+I looked at a few example apps and chose this one.  I wanted something with Python, Flask, and React.  I settled on the demo created by Okta, however I modified it to use Keycloak.
 
 I used the following tutorial and other listed material to construct the app:
 
@@ -106,7 +106,7 @@ oc process -f kudo-app.template.yaml \
 4. Setup the React App
 
 #### Notes
-* I describe a few `bootstrap` files I've created.  This are not in the repo.  
+* I describe a few `bootstrap` files I've created.  These are not in the repo.  
 
 ### Setup a local Keycloak service
 
@@ -159,7 +159,7 @@ docker-compose up -d
 export MONGO_URL=mongodb://mongo_user:mongo_secret@0.0.0.0:27017/
 ```
 
-* I use **pyenv** and created a python 3.8.2 env.
+* I use **pyenv** and created a python 3.8.2 env called `KUDO`.
 
 ```bash
 pyenv activate KUDO
