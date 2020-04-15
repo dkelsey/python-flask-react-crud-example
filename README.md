@@ -46,6 +46,7 @@ oc create imagestream kudo-app  -n ${YOUR_NAMESPACE}
 imagestream.image.openshift.io/kudo-api created
 ```
 
+_I provided a mongodb-secret.yaml.sample that can be customized._
 ```bash
 oc create  -f mongodb-secret.yaml -n ${YOUR_NAMESPACE}
 ```
