@@ -167,7 +167,7 @@ pyenv activate KUDO
 KUDO> pip install -r requirements.txt
 ```
 
-I created a **`bootstrap-app`**
+I created a **`bootstrap-api`**
 
 ```bash
 MONGO_URL=mongodb://mongo_user:mongo_secret@0.0.0.0:27017/ \
@@ -177,7 +177,7 @@ MONGO_URL=mongodb://mongo_user:mongo_secret@0.0.0.0:27017/ \
 ```
 
 ```bash
-. bootstrap-app
+. bootstrap-api
 ```
 ### The React App
 
