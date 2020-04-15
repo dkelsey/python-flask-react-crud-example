@@ -51,7 +51,7 @@ parameters:
     displayName: Kudo API Github REF
     name: KUDO_API_GITHUB_REF
     required: true
-    value: https://github.com/dkelsey/python-flask-react-crud-example.git
+    value: dev
   - description: The imageStream name for the kudo-api.
     displayName: Kudo API ImageStrean Name
     name: KUDO_API_IMAGESTREAM_NAME
@@ -78,7 +78,7 @@ parameters:
     required: true
     value: kudo-api
     #value: 192.168.64.4.nip.io
-  - description: The domain suffix to use for the route; ie pathfinder.gov.bc.ca 
+  - description: The domain suffix to use for the route; ie pathfinder.gov.bc.ca
     displayName: Domain Suffix
     name: DOMAIN_SUFFIX
     required: true
@@ -108,7 +108,7 @@ objects:
       protocol: TCP
       targetPort: 8080
     selector:
-      deploymentconfig: kudo
+      deploymentconfig: ${KUDO_API_DEPLOYMENTCONFIG_NAME}
     sessionAffinity: None
     type: ClusterIP
   status:
