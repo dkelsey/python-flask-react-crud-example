@@ -1,0 +1,248 @@
+apiVersion: v1
+kind: Template
+
+labels:
+  template: kudo-api
+
+message: |-
+  The following objects have been created in your project:
+
+    Buildconfig:       ${KUDO_API_BUILDCONFIG_NAME}
+    ImageStream:       ${KUDO_API_IMAGESTREAM_NAME}
+    DeploymentConfig:  ${KUDO_API_DEPLOYMENTCONFIG_NAME}
+    Service:           ${KUDO_API_SERVICE_NAME}
+    Route:             ${KUDO_API_SERVICE_NAME}${DOMAIN_SUFFIX}
+
+metadata:
+  annotations:
+    description: |-
+      kudo-api Template for use in OpenShift.
+    iconClass: icon-other-unknown
+    openshift.io/display-name: kudo-api
+    openshift.io/documentation-url: https://github.com/dkelsey/python-flask-react-crud-example.git
+    openshift.io/long-description: >-
+      This template provides a parameterized BuildConfig for the kudo-api ImageStreams.
+      The resulting BuildConfig, when run, creates an imageStream containing a build of caddy with required plugins.
+
+        * Kudo-api
+
+    openshift.io/provider-display-name: Kudo-API
+    openshift.io/support-url: https://github.com/dkelsey/python-flask-react-crud-example.git
+    tags: python, flask, api, REST
+  name: kudo-api-template
+
+parameters:
+  - description: The DeploymentConfig name for the kudo-api.
+    displayName: Kudo API Deployment Config Name
+    name: KUDO_API_DEPLOYMENTCONFIG_NAME
+    required: true
+    value: kudo-api
+  - description: The BuildConfig name for the kudo-api.
+    displayName: Kudo API Build Config Name
+    name: KUDO_API_BUILDCONFIG_NAME
+    required: true
+    value: kudo-api
+  - description: The GitHub repository URI the kudo-api code.
+    displayName: Kudo API Github URI
+    name: KUDO_API_GITHUB_URI
+    required: true
+    value: https://github.com/dkelsey/python-flask-react-crud-example.git
+  - description: The GitHub project ref. e.g. dev, qa, master
+    displayName: Kudo API Github REF
+    name: KUDO_API_GITHUB_REF
+    required: true
+    value: https://github.com/dkelsey/python-flask-react-crud-example.git
+  - description: The imageStream name for the kudo-api.
+    displayName: Kudo API ImageStrean Name
+    name: KUDO_API_IMAGESTREAM_NAME
+    required: true
+    value: kudo-api
+  - description: The name of the Kudo-API Service to be created
+    displayName: Kudo API Service Name
+    name: KUDO_API_SERVICE_NAME
+    required: true
+    value: kudo-api
+  - description: The name of the Kudo-API App to be created
+    displayName: Kudo API App Name
+    name: KUDO_API_APP_NAME
+    required: true
+    value: kudo-api
+  - description: The name of the Kudo-API route to be created
+    displayName: Kudo API Route Name
+    name: KUDO_API_ROUTE_NAME
+    required: true
+    value: kudo-api
+  - description: The kudo api hostname to use for the route; eg kudo-api
+    displayName: Kudo API Hostname
+    name: KUDO_API_HOSTNAME
+    required: true
+    value: kudo-api
+    #value: 192.168.64.4.nip.io
+  - description: The domain suffix to use for the route; ie pathfinder.gov.bc.ca 
+    displayName: Domain Suffix
+    name: DOMAIN_SUFFIX
+    required: true
+    value: pathfinder.gov.bc.ca
+    #value: 192.168.64.4.nip.io
+  - description: The OpenShift Namespace where the ImageStream resides.
+    displayName: Namespace
+    name: NAMESPACE
+    #value: openshift
+    required: true
+
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    labels:
+      app: ${KUDO_API_APP_NAME}
+    name: ${KUDO_API_SERVICE_NAME}
+    namespace: null
+  spec:
+    clusterIP: null
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      deploymentconfig: kudo
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    labels:
+      app: ${KUDO_API_APP_NAME}
+    name: ${KUDO_API_DEPLOYMENTCONFIG_NAME}
+    namespace: null
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: ${KUDO_API_APP_NAME}
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ${KUDO_API_APP_NAME}
+          deploymentconfig: ${KUDO_API_APP_NAME}
+      spec:
+        containers:
+        - env:
+          - name: MONGO_URL
+            value: mongodb://${MONGO_USER}:${MONGO_PASS}@mongodb:27017/
+          - name: MONGO_USER
+            valueFrom:
+              secretKeyRef:
+                key: database-user
+                name: mongodb
+          - name: MONGO_PASS
+            valueFrom:
+              secretKeyRef:
+                key: database-password
+                name: mongodb
+          image: docker-registry.default.svc:5000/${NAMESPACE}/${KUDO_API_IMAGESTREAM_NAME}@sha256:eaa2966e92874d1be452435711a3d86f57597b3e40a5b4dc1f54769e9c7b76c8
+          imagePullPolicy: Always
+          name: kudo
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - kudo
+        from:
+          kind: ImageStreamTag
+          name: ${KUDO_API_IMAGESTREAM_NAME}:latest
+          namespace: ${NAMESPACE}
+        lastTriggeredImage: docker-registry.default.svc:5000/${NAMESPACE}/${KUDO_API_IMAGESTREAM_NAME}@sha256:eaa2966e92874d1be452435711a3d86f57597b3e40a5b4dc1f54769e9c7b76c8
+      type: ImageChange
+    - type: ConfigChange
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    labels:
+      app: ${KUDO_API_APP_NAME}
+    name: ${KUDO_API_BUILDCONFIG_NAME}
+    namespace: null
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${KUDO_API_IMAGESTREAM_NAME}:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        ref: ${KUDO_API_GITHUB_REF}
+        uri: ${KUDO_API_GITHUB_URI}
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: python:3.6
+          namespace: openshift
+      type: Source
+    triggers:
+    - generic:
+        secret: 4228140659eebca1
+      type: Generic
+    - github:
+        secret: b5be98f4d5cf572d
+      type: GitHub
+    - imageChange:
+        lastTriggeredImageID: docker-registry.default.svc:5000/openshift/python@sha256:b78ccc700de3e8866aafa0b6267485d1dfb69bf7db9b2c57535ddaa388be5efa
+      type: ImageChange
+    - type: ConfigChange
+  status:
+    lastVersion: 5
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+      openshift.io/host.generated: "true"
+    labels:
+      app: ${KUDO_API_APP_NAME}
+    name: ${KUDO_API_ROUTE_NAME}
+    namespace: null
+  spec:
+    host: ${KUDO_API_HOSTNAME}.${DOMAIN_SUFFIX}
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: ${KUDO_API_SERVICE_NAME}
+      weight: 100
+    wildcardPolicy: None

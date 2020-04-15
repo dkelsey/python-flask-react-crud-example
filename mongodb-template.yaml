@@ -1,0 +1,179 @@
+apiVersion: v1
+kind: Template
+
+labels:
+  template: kudo-mongodb
+
+message: |-
+  some stuff
+
+metadata:
+  annotations:
+    description: |-
+      kudo-mongodb Template for use in OpenShift.
+    iconClass: icon-other-unknown
+    openshift.io/display-name: kudo-mongodb
+    openshift.io/documentation-url: https://github.com/dkelsey/python-flask-react-crud-example.git
+    openshift.io/long-description: >-
+      This template provides a parameterized BuildConfig for the caddy-bc-smk ImageStreams.
+      The resulting BuildConfig, when run, creates an imageStream containing a build of caddy with required plugins.
+
+        * Deploy MongoDB
+
+      TODO: this isn't correct - fix.
+    openshift.io/provider-display-name: Kudo-MongoDB
+    openshift.io/support-url: https://github.com/dkelsey/python-flask-react-crud-example.git
+    tags: mongodb, kudo 
+  name: kudo-mongodb-template
+
+parameters:
+  - description: The name of the app to be created
+    displayName: Mongodb Kudo App Name
+    name: MONGODB_KUDO_APP_NAME
+    required: true
+    value: mongodb-kudo
+  - description: The name of the Deployment Config to be created
+    displayName: Mongodb Deployment Config Name
+    name: MONGODB_DEPLOYMENT_CONFIG_NAME
+    required: true
+    value: mongodb-kudo
+  - description: The name of the Service to be created
+    displayName: Service Name
+    name: MONGODB_SERVICE_NAME
+    required: true
+    value: mongodb
+
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      template.openshift.io/expose-uri: mongodb://{.spec.clusterIP}:{.spec.ports[?(.name=="mongo")].port}
+    labels:
+      app: ${MONGODB_KUDO_APP_NAME}
+      #template: mongodb-persistent-template
+    name: ${MONGODB_SERVICE_NAME}
+    namespace: null
+  spec:
+    clusterIP: null
+    ports:
+    - name: mongo
+      port: 27017
+      protocol: TCP
+      targetPort: 27017
+    selector:
+      name: mongodb
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: "true"
+    generation: 3
+    labels:
+      app: ${MONGODB_KUDO_APP_NAME}
+      #template: mongodb-persistent-template
+    name: ${MONGODB_DEPLOYMENT_CONFIG_NAME}
+    namespace: 
+  spec:
+    replicas: 0
+    revisionHistoryLimit: 10
+    selector:
+      name: mongodb
+    strategy:
+      activeDeadlineSeconds: 21600
+      recreateParams:
+        timeoutSeconds: 600
+      resources: {}
+      type: Recreate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: mongodb
+      spec:
+        containers:
+        - env:
+          - name: MONGODB_USER
+            valueFrom:
+              secretKeyRef:
+                key: database-user
+                name: mongodb
+          - name: MONGODB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-password
+                name: mongodb
+          - name: MONGODB_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-admin-password
+                name: mongodb
+          - name: MONGODB_DATABASE
+            valueFrom:
+              secretKeyRef:
+                key: database-name
+                name: mongodb
+          image: docker-registry.default.svc:5000/openshift/mongodb@sha256:e37f9d4bca513c086df07ee3d662806e2b3d927f403237ac963136406e87488e
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 27017
+            timeoutSeconds: 1
+          name: mongodb
+          ports:
+          - containerPort: 27017
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -i
+              - -c
+              - mongo 127.0.0.1:27017/$MONGODB_DATABASE -u $MONGODB_USER -p $MONGODB_PASSWORD
+                --eval="quit()"
+            failureThreshold: 3
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 512Mi
+          securityContext:
+            capabilities: {}
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/lib/mongodb/data
+            name: mongodb-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: mongodb-data
+          persistentVolumeClaim:
+            claimName: mongodb
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - mongodb
+        from:
+          kind: ImageStreamTag
+          name: mongodb:3.2
+          namespace: openshift
+        lastTriggeredImage: docker-registry.default.svc:5000/openshift/mongodb@sha256:e37f9d4bca513c086df07ee3d662806e2b3d927f403237ac963136406e87488e
+      type: ImageChange
+    - type: ConfigChange
