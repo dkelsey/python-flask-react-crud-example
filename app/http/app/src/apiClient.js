@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URI = 'http://localhost:4433';
+const BASE_URI = process.env.KUDO_API_HOST || 'http://localhost:4433';
 
 const client = axios.create({
  baseURL: BASE_URI,
