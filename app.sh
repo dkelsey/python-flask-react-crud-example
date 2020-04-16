@@ -1,4 +1,4 @@
-export MONGO_URL=mongodb://${MONGO_USER}:${MONGO_PASS}@${MONGO_SERVICE}:${MONGODB_SERVICE_PORT}/ \
+export MONGO_URL=mongodb://${MONGO_USER}:${MONGO_PASS}@${MONGO_SERVICE}:${MONGO_SERVICE_PORT}/ \
     FLASK_APP=$PWD/app/http/api/endpoints.py \
     FLASK_ENV=${ENV:-development} \
     PORT=${APIPORT:-8080}
