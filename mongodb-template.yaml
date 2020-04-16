@@ -41,7 +41,7 @@ parameters:
     displayName: Service Name
     name: MONGODB_SERVICE_NAME
     required: true
-    value: mongodb
+    value: mongodb-kudo
 
 objects:
 - apiVersion: v1
@@ -51,7 +51,7 @@ objects:
       template.openshift.io/expose-uri: mongodb://{.spec.clusterIP}:{.spec.ports[?(.name=="mongo")].port}
     labels:
       app: ${MONGODB_KUDO_APP_NAME}
-      #template: mongodb-persistent-template
+      template: kudo-mongodb-template
     name: ${MONGODB_SERVICE_NAME}
     namespace: null
   spec:
@@ -62,7 +62,7 @@ objects:
       protocol: TCP
       targetPort: 27017
     selector:
-      name: mongodb
+      name: ${MONGODB_KUDO_APP_NAME}
     sessionAffinity: None
     type: ClusterIP
   status:
@@ -79,10 +79,10 @@ objects:
     name: ${MONGODB_DEPLOYMENT_CONFIG_NAME}
     namespace: 
   spec:
-    replicas: 0
+    replicas: 1
     revisionHistoryLimit: 10
     selector:
-      name: mongodb
+      name: ${MONGODB_KUDO_APP_NAME}
     strategy:
       activeDeadlineSeconds: 21600
       recreateParams:
@@ -93,7 +93,7 @@ objects:
       metadata:
         creationTimestamp: null
         labels:
-          name: mongodb
+          name: ${MONGODB_KUDO_APP_NAME}
       spec:
         containers:
         - env:
