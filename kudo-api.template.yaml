@@ -46,7 +46,7 @@ parameters:
     displayName: MongoDB Service Port
     name: MONGODB_SERVICE_PORT
     required: true
-    value: 27017
+    value: '27017'
   - description: The BuildConfig name for the kudo-api.
     displayName: Kudo API Build Config Name
     name: KUDO_API_BUILDCONFIG_NAME
@@ -238,7 +238,7 @@ objects:
       type: ImageChange
     - type: ConfigChange
   status:
-    lastVersion: 5
+    lastVersion: 0
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
