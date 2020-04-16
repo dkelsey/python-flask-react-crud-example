@@ -31,8 +31,7 @@ class APIClient {
      url: resource,
      data,
      headers: {
-       Authorization: `Bearer ${this.accessToken}`,
-       Origin: window.location.origin
+       Authorization: `Bearer ${this.accessToken}`
      }
    }).then(resp => {
      return resp.data ? resp.data : [];
