@@ -143,7 +143,7 @@ objects:
         secret: LeBZUEX6hHSM79Uxfj7I
       type: Generic
   status:
-    lastVersion: 1
+    lastVersion: 0
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
