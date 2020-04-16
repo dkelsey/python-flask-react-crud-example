@@ -1,5 +1,17 @@
 # Overview
 
+## Summary of the App
+
+* Users can login and search for GitHub Repos and bookmark them.
+* A working versions of the app can be found here:
+
+https://kudo.pathfinder.gov.bc.ca
+
+You can use your IDIR or a Github account to authenticate.
+
+
+## Background
+
 This app was created as an exercise. The goal was to create templates to automate the deployment of an application into OpenShift where the application has least 2 components which communicate with each other.
 
 I looked at a few example apps and chose this one.  I wanted something with Python, Flask, and React.  I settled on the demo created by Okta, however I modified it to use Keycloak.
@@ -18,17 +30,17 @@ I used the following tutorial and other listed material to construct the app:
 
 ## The App Components
 
-* A Mongodb database.
+* A MongoDB database.
 * A python/flask API.
 * A React frontend App that integrates with Keycloak.
-* A Keycloak setup with a realm, a client, and some users.
+* A Keycloak setup with a realm, a client, and some users, or an identity provider.
 
 
 # Provisioning in OpenShift
 #### Task Summary
 
 1. Create ImageStreams and Secrets
-2. Provision Mongodb
+2. Provision MongoDB
 3. Provision the API
 4. Configure a Keycloak
 5. Provision the React App
