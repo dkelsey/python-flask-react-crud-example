@@ -1,8 +1,8 @@
 {
-  "realm": "is30realm",
-  "auth-server-url": "http://localhost:8081/auth/",
+  "realm": "ido-all",
+  "auth-server-url": "https://sso-test.pathfinder.gov.bc.ca/auth",
   "ssl-required": "external",
-  "resource": "myclient",
+  "resource": "kudo",
   "public-client": true,
   "confidential-port": 0
 }
