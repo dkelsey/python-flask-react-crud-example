@@ -42,6 +42,11 @@ parameters:
     name: MONGODB_SERVICE_NAME
     required: true
     value: mongodb-kudo
+  - description: The Service port of the Kudo MongoDB
+    displayName: MongoDB Service Port
+    name: MONGODB_SERVICE_PORT
+    required: true
+    value: 27017
   - description: The BuildConfig name for the kudo-api.
     displayName: Kudo API Build Config Name
     name: KUDO_API_BUILDCONFIG_NAME
@@ -152,6 +157,8 @@ objects:
         - env:
           - name: MONGO_SERVICE
             value: ${MONGODB_SERVICE_NAME}
+          - name: MONGO_SERVICE_PORT
+            value: ${MONGODB_SERVICE_PORT}
           - name: MONGO_USER
             valueFrom:
               secretKeyRef:
