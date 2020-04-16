@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URI = 'http://kudo-api.pathfinder.gov.bc.ca';
+const BASE_URI = 'https://kudo-api.pathfinder.gov.bc.ca';
 //const BASE_URI = 'http://localhost:4433';
 
 const client = axios.create({
