@@ -1,4 +1,5 @@
 import os
+import sys
 from pymongo import MongoClient
 
 COLLECTION_NAME = 'kudos'
@@ -6,6 +7,7 @@ COLLECTION_NAME = 'kudos'
 class MongoRepository(object):
   def __init__(self):
     mongo_url = os.environ.get('MONGO_URL')
+    print("mongo_url: %s" % mongo_url, file=sys.stderr)
     self.db = MongoClient(mongo_url + '?authSource=admin').kudos
 
   def find_all(self, selector):
